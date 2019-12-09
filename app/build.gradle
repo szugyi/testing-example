@@ -31,6 +31,10 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+
+    useLibrary 'android.test.runner'
+    useLibrary 'android.test.base'
+    useLibrary 'android.test.mock'
 }
 
 dependencies {
@@ -42,6 +46,8 @@ dependencies {
 
     // Dependencies for local unit tests
     testImplementation "junit:junit:$junit_version"
+    testImplementation "io.mockk:mockk:$mockk_version"
+    testImplementation "com.google.truth:truth:$truth_version"
     testImplementation "org.mockito:mockito-core:$mockito_version"
     testImplementation "org.mockito:mockito-inline:$mockito_version"
     testImplementation "org.robolectric:robolectric:$roboelectric_version"
@@ -49,8 +55,8 @@ dependencies {
     // Dependencies for Android unit tests
     androidTestImplementation "androidx.test.ext:junit:$androidx_junit_version"
     androidTestImplementation "androidx.test:rules:$test_runner_version"
-    androidTestImplementation "org.mockito:mockito-core:$mockito_version"
     androidTestImplementation "androidx.test:runner:$test_runner_version"
+    androidTestImplementation "org.mockito:mockito-core:$mockito_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
 
     kapt "com.google.dagger:dagger-compiler:$dagger_version"
@@ -61,5 +67,5 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$lifecycle_version"
     implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
     implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
-
+    implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlin_version"
 }
