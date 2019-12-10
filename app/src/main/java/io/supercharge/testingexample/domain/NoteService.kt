@@ -1,45 +1,31 @@
 package io.supercharge.testingexample.domain
 
-import io.reactivex.BackpressureStrategy
 import io.reactivex.Completable
 import io.reactivex.Flowable
-import io.reactivex.processors.BehaviorProcessor
-import io.reactivex.processors.FlowableProcessor
 import io.supercharge.testingexample.domain.action.NoteAction
+import io.supercharge.testingexample.domain.api.NoteApi
 import io.supercharge.testingexample.domain.model.Note
+import io.supercharge.testingexample.domain.repository.NoteRepository
 import io.supercharge.testingexample.domain.store.NoteStore
 import io.supercharge.testingexample.threading.Schedulers
-import java.util.*
+import timber.log.Timber
 import javax.inject.Inject
-import kotlin.random.Random
+import javax.inject.Singleton
 
-class NoteService @Inject internal constructor(
-    private val schedulers: Schedulers
+@Singleton
+class NoteService
+@Inject internal constructor(
+    private val schedulers: Schedulers,
+    private val noteRepository: NoteRepository,
+    private val noteApi: NoteApi
 ) : NoteStore, NoteAction {
 
-    private val notesProcessor: FlowableProcessor<List<Note>> = BehaviorProcessor.create<List<Note>>()
-
-    override fun refresh(): Completable = Completable.fromAction { notesProcessor.onNext(generateNotes()) }
-
-    override fun getNoteList(): Flowable<List<Note>> {
-        return Flowable.create<List<Note>>({ source ->
-            val disposable = notesProcessor
-                .subscribe({ source.onNext(it) }, { source.onError(it) })
-
-            source.setCancellable { disposable.dispose() }
-        }, BackpressureStrategy.BUFFER)
-            .onErrorResumeNext(Flowable.just(Collections.emptyList()))
+    override fun refresh(): Completable =
+        noteApi.downloadNotes()
+            .doOnSuccess { Timber.d("We could map api models to data models here") }
+            .doOnError { Timber.d("Network error handling maybe?") }
             .subscribeOn(schedulers.io())
-            .observeOn(schedulers.ui())
-    }
+            .flatMapCompletable(noteRepository::saveNotes)
 
-    private fun generateNotes(): List<Note> {
-        val notes = ArrayList<Note>()
-
-        for (i in 1..20) {
-            notes.add(Note(Random.nextLong(), "Note: ".plus(i), Random.nextInt(10, 30)))
-        }
-
-        return notes
-    }
+    override fun getNoteList(): Flowable<List<Note>> = noteRepository.getNoteList()
 }

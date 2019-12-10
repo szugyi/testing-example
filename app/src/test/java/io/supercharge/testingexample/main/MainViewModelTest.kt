@@ -30,67 +30,67 @@ class MainViewModelTest {
         clearAllMocks()
     }
 
-    @Test
-    fun loadNoteListFromStore_EmptyResults() {
-        // given
-        every { mockNoteService.getNoteList() } returns Flowable.just(emptyList())
-
-        val viewModel = MainViewModel(mockNoteService)
-
-        // when
-        val testSubscriber = viewModel.noteList.test()
-
-        // then
-        testSubscriber
-            .assertNoErrors()
-            .assertValue { list -> list.isEmpty() }
-    }
-
-    @Test
-    fun loadNoteListFromStore_NonEmptyResults() {
-        // given
-        every { mockNoteService.getNoteList() } returns Flowable.just(getNotes())
-
-        val viewModel = MainViewModel(mockNoteService)
-
-        // when
-        val testSubscriber = viewModel.noteList.test()
-
-        // then
-        testSubscriber
-            .assertNoErrors()
-            .assertValue { list -> !list.isEmpty() }
-    }
-
-    @Test
-    fun loadNoteListFromStore_CorrectValueCalculated() {
-        // given
-        every { mockNoteService.getNoteList() } returns Flowable.just(getNotes())
-
-        val viewModel = MainViewModel(mockNoteService)
-
-        // when
-        val testSubscriber = viewModel.noteList.test()
-
-        // then
-        testSubscriber
-            .assertNoErrors()
-            .assertValue { list -> viewModel.calculate(list) == 50 }
-    }
-
-    @Test
-    fun callRefreshFromAction_Complete() {
-        // given
-        every { mockNoteService.refresh() } returns Completable.complete()
-
-        val viewModel = MainViewModel(mockNoteService)
-
-        // when
-        viewModel.refreshRunnable.run()
-
-        // then
-        verify { mockNoteService.refresh() }
-    }
+//    @Test
+//    fun loadNoteListFromStore_EmptyResults() {
+//        // given
+//        every { mockNoteService.getNoteList() } returns Flowable.just(emptyList())
+//
+//        val viewModel = MainViewModel(mockNoteService)
+//
+//        // when
+//        val testSubscriber = viewModel.noteList.test()
+//
+//        // then
+//        testSubscriber
+//            .assertNoErrors()
+//            .assertValue { list -> list.isEmpty() }
+//    }
+//
+//    @Test
+//    fun loadNoteListFromStore_NonEmptyResults() {
+//        // given
+//        every { mockNoteService.getNoteList() } returns Flowable.just(getNotes())
+//
+//        val viewModel = MainViewModel(mockNoteService)
+//
+//        // when
+//        val testSubscriber = viewModel.noteList.test()
+//
+//        // then
+//        testSubscriber
+//            .assertNoErrors()
+//            .assertValue { list -> !list.isEmpty() }
+//    }
+//
+//    @Test
+//    fun loadNoteListFromStore_CorrectValueCalculated() {
+//        // given
+//        every { mockNoteService.getNoteList() } returns Flowable.just(getNotes())
+//
+//        val viewModel = MainViewModel(mockNoteService)
+//
+//        // when
+//        val testSubscriber = viewModel.noteList.test()
+//
+//        // then
+//        testSubscriber
+//            .assertNoErrors()
+//            .assertValue { list -> viewModel.calculate(list) == 50 }
+//    }
+//
+//    @Test
+//    fun callRefreshFromAction_Complete() {
+//        // given
+//        every { mockNoteService.refresh() } returns Completable.complete()
+//
+//        val viewModel = MainViewModel(mockNoteService)
+//
+//        // when
+//        viewModel.refreshRunnable.run()
+//
+//        // then
+//        verify { mockNoteService.refresh() }
+//    }
 
     private fun getNotes(): List<Note> {
         val noteList = ArrayList<Note>()

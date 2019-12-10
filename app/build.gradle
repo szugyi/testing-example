@@ -49,6 +49,7 @@ dependencies {
     testImplementation "io.mockk:mockk:$mockk_version"
     testImplementation "com.google.truth:truth:$truth_version"
     testImplementation "org.robolectric:robolectric:$roboelectric_version"
+    testImplementation "net.lachlanmckee:timber-junit-rule:$timber_rule_version"
 
     // Dependencies for Android unit tests
     androidTestImplementation "androidx.test.ext:junit:$androidx_junit_version"

@@ -25,15 +25,16 @@ class MainActivity : DaggerAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel = ViewModelProviders.of(this, mainViewModelFactory).get(MainViewModel::class.java)
+        val viewModel =
+            ViewModelProviders.of(this, mainViewModelFactory).get(MainViewModel::class.java)
 
         val binding = DataBindingUtil
             .setContentView<ActivityMainBinding>(this, R.layout.activity_main)
         binding.vm = viewModel
 
         disposable = viewModel.noteList
-            .filter { notes -> !notes.isEmpty() }
-            .doOnError { t: Throwable? -> Timber.d(t) }
+            .filter { notes -> notes.isNotEmpty() }
+            .doOnError { Timber.e(it) }
             .subscribe { notes ->
                 noteAdapter.setItems(notes)
                 noteList.adapter = noteAdapter
