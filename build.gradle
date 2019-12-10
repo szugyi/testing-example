@@ -12,7 +12,6 @@ buildscript {
     ext.espresso_version = '3.2.0'
     ext.junit_version = '4.12'
     ext.androidx_junit_version = '1.1.0'
-    ext.mockito_version = '2.27.0'
     ext.roboelectric_version = '4.3'
     ext.mockk_version = '1.9.3'
     ext.truth_version = '1.0'

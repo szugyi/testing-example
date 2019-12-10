@@ -1,28 +1,39 @@
 package io.supercharge.testingexample.main
 
+import io.mockk.MockKAnnotations
+import io.mockk.clearAllMocks
+import io.mockk.every
+import io.mockk.impl.annotations.RelaxedMockK
+import io.mockk.verify
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.supercharge.testingexample.domain.NoteService
 import io.supercharge.testingexample.domain.model.Note
 import io.supercharge.testingexample.model.MainViewModel
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.BDDMockito.given
-import org.mockito.BDDMockito.then
-import org.mockito.Mock
-import org.mockito.junit.MockitoJUnitRunner
 import java.util.*
 
-@RunWith(MockitoJUnitRunner::class)
 class MainViewModelTest {
 
-    @Mock
+    @RelaxedMockK
     private lateinit var mockNoteService: NoteService
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this, relaxUnitFun = true)
+    }
+
+    @After
+    fun tearDown() {
+        clearAllMocks()
+    }
 
     @Test
     fun loadNoteListFromStore_EmptyResults() {
         // given
-        given(mockNoteService.getNoteList()).willReturn(Flowable.just(Collections.emptyList()))
+        every { mockNoteService.getNoteList() } returns Flowable.just(emptyList())
 
         val viewModel = MainViewModel(mockNoteService)
 
@@ -38,7 +49,7 @@ class MainViewModelTest {
     @Test
     fun loadNoteListFromStore_NonEmptyResults() {
         // given
-        given(mockNoteService.getNoteList()).willReturn(Flowable.just(getNotes()))
+        every { mockNoteService.getNoteList() } returns Flowable.just(getNotes())
 
         val viewModel = MainViewModel(mockNoteService)
 
@@ -52,23 +63,9 @@ class MainViewModelTest {
     }
 
     @Test
-    fun callRefreshFromAction_Complete() {
-        // given
-        given(mockNoteService.refresh()).willReturn(Completable.complete())
-
-        val viewModel = MainViewModel(mockNoteService)
-
-        // when
-        viewModel.refreshRunnable.run()
-
-        // then
-        then(mockNoteService).should().refresh()
-    }
-
-    @Test
     fun loadNoteListFromStore_CorrectValueCalculated() {
         // given
-        given(mockNoteService.getNoteList()).willReturn(Flowable.just(getNotes()))
+        every { mockNoteService.getNoteList() } returns Flowable.just(getNotes())
 
         val viewModel = MainViewModel(mockNoteService)
 
@@ -79,6 +76,20 @@ class MainViewModelTest {
         testSubscriber
             .assertNoErrors()
             .assertValue { list -> viewModel.calculate(list) == 50 }
+    }
+
+    @Test
+    fun callRefreshFromAction_Complete() {
+        // given
+        every { mockNoteService.refresh() } returns Completable.complete()
+
+        val viewModel = MainViewModel(mockNoteService)
+
+        // when
+        viewModel.refreshRunnable.run()
+
+        // then
+        verify { mockNoteService.refresh() }
     }
 
     private fun getNotes(): List<Note> {
