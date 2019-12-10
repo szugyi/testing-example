@@ -2,4 +2,6 @@
     <string name="app_name">TestingExample</string>
     <string name="refresh_label">Refresh</string>
     <string name="amount_label">Sum: %d Ft</string>
+
+    <string name="note_title">Title: %s</string>
 </resources>

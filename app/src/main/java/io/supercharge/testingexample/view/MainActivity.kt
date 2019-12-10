@@ -5,10 +5,11 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import dagger.android.support.DaggerAppCompatActivity
-import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.CompositeDisposable
 import io.supercharge.testingexample.R
 import io.supercharge.testingexample.databinding.ActivityMainBinding
 import io.supercharge.testingexample.model.MainViewModel
+import io.supercharge.testingexample.threading.Schedulers
 import io.supercharge.testingexample.view.adapter.NoteAdapter
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
@@ -19,7 +20,10 @@ class MainActivity : DaggerAppCompatActivity() {
     @Inject
     lateinit var mainViewModelFactory: ViewModelProvider.Factory
 
-    private lateinit var disposable: Disposable
+    @Inject
+    lateinit var schedulers: Schedulers
+
+    private val disposables = CompositeDisposable()
 
     private val noteAdapter = NoteAdapter()
 
@@ -32,20 +36,27 @@ class MainActivity : DaggerAppCompatActivity() {
             .setContentView<ActivityMainBinding>(this, R.layout.activity_main)
         binding.vm = viewModel
 
-        disposable = viewModel.noteList
-            .filter { notes -> notes.isNotEmpty() }
-            .doOnError { Timber.e(it) }
-            .subscribe { notes ->
-                noteAdapter.setItems(notes)
-                noteList.adapter = noteAdapter
-                amountText.text = getString(R.string.amount_label, viewModel.calculate(notes))
-            }
+        disposables.addAll(
+            viewModel.noteList
+                .filter { notes -> notes.isNotEmpty() }
+                .doOnError { Timber.e(it) }
+                .observeOn(schedulers.ui())
+                .subscribe { notes ->
+                    noteAdapter.setItems(notes)
+                    noteList.adapter = noteAdapter
+                },
+
+            viewModel.sum
+                .doOnError { Timber.e(it) }
+                .observeOn(schedulers.ui())
+                .subscribe { sum ->
+                    amountText.text = getString(R.string.amount_label, sum)
+                }
+        )
     }
 
     override fun onDestroy() {
-        if (!disposable.isDisposed) {
-            disposable.dispose()
-        }
+        disposables.clear()
 
         super.onDestroy()
     }
