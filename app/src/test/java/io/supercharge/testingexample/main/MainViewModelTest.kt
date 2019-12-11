@@ -36,15 +36,15 @@ class MainViewModelTest {
 
     @Test
     fun `note list is empty if the note store does not have any note`() {
-        // given
+        // given an empty note store
         every { mockNoteStore.getNoteList() } returns Flowable.just(emptyList())
 
         val viewModel = createViewModel()
 
-        // when
+        // when the note list is bound
         val testSubscriber = viewModel.noteList.test()
 
-        // then
+        // then the note list contains no element
         testSubscriber
             .assertNoErrors()
             .assertValue { list -> list.isEmpty() }
@@ -52,17 +52,17 @@ class MainViewModelTest {
 
     @Test
     fun `note list contains the notes returned by the note store`() {
-        // given
+        // given a note store with multiple notes
         mockkObject(NoteUtil)
 
         every { NoteUtil.getLocalizedNoteTitle(any()) } returns ""
 
         val viewModel = createViewModel()
 
-        // when
+        // when the note list is bound
         val testSubscriber = viewModel.noteList.test()
 
-        // then
+        // then the note list is not empty
         testSubscriber
             .assertNoErrors()
             .assertValue { list -> list.isNotEmpty() }
@@ -70,13 +70,13 @@ class MainViewModelTest {
 
     @Test
     fun `sum returns the sum of all note amounts`() {
-        // given
+        // given a note store with multiple notes
         val viewModel = createViewModel()
 
-        // when
+        // when the sum value is bound
         val testSubscriber = viewModel.sum.test()
 
-        // then
+        // then the sum of all the elements is received
         testSubscriber
             .assertNoErrors()
             .assertValue(50)
@@ -84,15 +84,15 @@ class MainViewModelTest {
 
     @Test
     fun `refresh action is called when refresh runnable is run`() {
-        // given
+        // given an initialized viewModel
         every { mockNoteAction.refresh() } returns Completable.complete()
 
         val viewModel = createViewModel()
 
-        // when
+        // when the refresh runnable is invoked
         viewModel.refreshRunnable.run()
 
-        // then
+        // then the refresh action is triggered
         verify { mockNoteAction.refresh() }
     }
 

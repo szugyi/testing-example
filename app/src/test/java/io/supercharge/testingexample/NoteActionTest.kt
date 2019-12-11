@@ -46,7 +46,7 @@ class NoteActionTest {
 
     @Test
     fun `refresh calls notes api and saves the result into the notes repository`() {
-        // given
+        // given the server has one note
         val downloadedList = listOf(DEFAULT_NOTE)
 
         every { mockApi.downloadNotes() } returns Single.just(downloadedList)
@@ -54,10 +54,10 @@ class NoteActionTest {
 
         val action = createNoteAction()
 
-        // when
+        // when the notes are refreshed
         val testSubscriber = action.refresh().test()
 
-        // then
+        // then the note list is received and saved to the repository
         testSubscriber.assertComplete()
 
         verifyOrder {

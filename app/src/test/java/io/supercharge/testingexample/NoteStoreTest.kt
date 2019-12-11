@@ -38,20 +38,20 @@ class NoteStoreTest {
 
     @Test
     fun `getNoteList returns the notes from the note repository`() {
-        // given
+        // given the repository contains one note
         every { mockRepository.getNoteList() } returns Flowable.just(listOf(DEFAULT_NOTE))
 
         val noteStore = createNoteStore()
 
-        // when
+        // when the note list is accessed
         val testSubscriber = noteStore.getNoteList().test()
 
-        // then
+        // then we receive the list with one item
+        verify { mockRepository.getNoteList() }
+
         testSubscriber
             .assertNoErrors()
             .assertValue(listOf(DEFAULT_NOTE))
-
-        verify { mockRepository.getNoteList() }
     }
 
     private fun createNoteStore(): NoteStore = NoteService(schedulers, mockRepository, mockApi)
